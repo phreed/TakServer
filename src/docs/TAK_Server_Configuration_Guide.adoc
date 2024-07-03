@@ -204,7 +204,7 @@ debsig: Verified package from 'TAK Product Center' (TAK Server Release)
 [[new-installation-one-server-3]]
 === New Installation: One Server
 
-Start with a fresh install of a supported OS.
+Start with a fresh installation of a supported OS.
 For AWS / cloud installation, see recommended instance type on <<aws-govcloud-recommended-instance-type-3>>.
 An OS install with a GUI is recommended, so that a web browser can be run locally to configure TAK Server.
 
@@ -212,7 +212,7 @@ Increase system limit for number of concurrent TCP connections (do once):
 
 [source,shell]
 ----
-echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf > /dev/null
+echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf
 ----
 
 [[tak-server-installation-7]]
@@ -2058,7 +2058,7 @@ or by username-password access using OAuth (https port 8446).
 
 In either case, TAK Server must be configured with a server certificate and truststore (see Appendix B).
 
-In the Admin UI menu, use *Situation Awareness -> WebTAK* to access WebTAK.
+In the Admin UI menu, use #Situation Awareness -> WebTAK# to access WebTAK.
 
 
 [[device-profiles-1]]
@@ -2365,7 +2365,7 @@ The OAuth2 token endpoint is available at `https://<takserver>:8446/oauth/token`
 
 The User Management UI provides an intuitive drag-and-drop mechanisms for managing TAK user accounts.
 The tool is integrated within TAK Server and can be accessed from the TAK main menu,
-under #Administrative >> Manage Users#.
+under #Administrative -> Manage Users#.
 Users need to have an admin role to access the tool.
 Currently, the User Management UI supports only file-based users and not LDAP/AD users.
 
@@ -2811,6 +2811,7 @@ The sslmode "require" means "I trust that the network will make sure I always co
 More information on the sslmode can be found here: https://www.postgresql.org/docs/current/libpq-ssl.html
 
 - Test database permission from the psql prompt:
+[pass]
 [source,sql]
 ----
 select count(*) from cot_router;
