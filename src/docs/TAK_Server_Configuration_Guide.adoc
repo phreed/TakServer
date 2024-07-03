@@ -1,10 +1,12 @@
 = TAK Server:: Configuration Guide
-:doctype: book
+:doctype: article
 :showtitle:
 :title-separator: ::
 :revnumber: 5.1
 :revdate: April 2024
 :version-label!:
+:fragdir: ./fragments
+:config_dir: ./configs
 :sectnums:
 :sectnumlevels: 5
 :toc: macro
@@ -21,9 +23,11 @@ toc::[]
 [[about-tak-server-1]]
 == About TAK Server
 
-TAK Server is a situational awareness server, that provides a dynamic Common Operating Picture to users of the Team Awareness Kit,
+TAK Server is a situational awareness server,
+that provides a dynamic Common Operating Picture to users of the Team Awareness Kit,
 including ATAK (Android), WinTAK (Windows) and WebTAK.
-TAK enables sharing of geolocated information in real time for military forces, law enforcement, and emergency responders.
+TAK enables sharing of geolocated information in real time for military forces,
+law enforcement, and emergency responders.
 It supports both wireless and wired networks, as well as cloud and data center deployment.
 
 [[change-log-1]]
@@ -138,7 +142,8 @@ Ubuntu/RaspPi:: takserver-fed-hub_5.1-RELEASE-x_all.deb
 Federation hub documentation available here:
 
 .Verifying GPG signatures on RPM packages
-The GPG public key for TAK Server can be found under https://artifacts.tak.gov/ui/repos/tree/General/TAKServer/release/ .
+The GPG public key for TAK Server can be found under
+https://artifacts.tak.gov/ui/repos/tree/General/TAKServer/release/ .
 Select the TAK Server release version and download the file _takserver-public-gpg.key_
 
 Import the key to the RPM key management:
@@ -219,16 +224,17 @@ echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/secu
 * Install EPEL (EPEL provides certain dependencies required by PostgreSQL.)
 * Install postgres yum repository.
 * Install java 17.
-* Disable the postgresql module (so the later postgresql and postgis specific versions aren't inaccessible due to 'modular filtering').
+* Disable the postgresql module
+(so the later postgresql and postgis specific versions aren't inaccessible due to 'modular filtering').
 * Enable PowerTools (needed for dependencies of postgis.) Install TAK server.
 * Apply SELinux takserver-policy.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
 sudo dnf install epel-release -y
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm _
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 sudo dnf -qy module disable postgresql && sudo dnf update -y
 sudo dnf install java-17-openjdk-devel -y
 sudo dnf config-manager --set-enabled powertools
@@ -237,7 +243,7 @@ sudo dnf install checkpolicy
 cd /opt/tak && sudo ./apply-selinux.sh && sudo semodule -l | grep takserver
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-8-15]]
 ===== RHEL 8
@@ -288,12 +294,13 @@ Note::: ATAK may not support certificates generated with these stronger algorith
 ====== Install EPEL (EPEL provides certain dependencies required by PostgreSQL.)
 * Install postgres yum repository.
 * Install java 17.
-* Disable the postgresql module (so the later postgresql and postgis specific versions aren't inaccessible due to 'modular filtering').
+* Disable the postgresql module
+(so the later postgresql and postgis specific versions aren't inaccessible due to 'modular filtering').
 * Enable Repository Management and repository CodeReady Builder.
 * Install TAK server.
 * Apply SELinux takserver-policy.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
@@ -305,7 +312,7 @@ sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms_
 ----
 
-include::note-system-no-repositories.adoc[]
+include::{fragdir}/note-system-no-repositories.adoc[]
 
 [source,shell]
 ----
@@ -314,7 +321,7 @@ sudo dnf install checkpolicy
 cd /opt/tak && sudo ./apply-selinux.sh && sudo semodule -l | grep takserver
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-7-15]]
 ===== RHEL 7
@@ -324,7 +331,7 @@ Install postgres yum repository (required in order to install up-to-date Postgre
 Install OpenJDK 17 and other dependencies.
 Install TAK server
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
@@ -336,9 +343,9 @@ sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_
 sudo rpm -ivh takserver-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[ubuntu-and-raspberry-pi-os-15]]
 ===== Ubuntu and Raspberry Pi OS
@@ -352,12 +359,13 @@ Install TAK server
 ----
 sudo mkdir -p /etc/apt/keyrings
 sudo curl https://www.postgresql.org/media/keys/ACCC4CF8.asc --output /etc/apt/keyrings/postgresql.asc
-sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/postgresql.list'
+echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
+ sudo tee /etc/apt/sources.list.d/postgresql.list
 sudo apt update
 sudo apt install ./takserver-5.1-RELEASEx_all.deb
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[centos-7-15]]
 ===== CentOS 7
@@ -367,21 +375,21 @@ Install postgres yum repository (required in order to install up-to-date Postgre
 Install OpenJDK 17 and other dependencies.
 Install Tak server.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
 sudo yum install epel-release -y
-sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y _
+sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo yum install -y postgis33_15 postgis33_15-utils
 sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 sudo rpm -ivh takserver-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[yum-install-from-tak.gov-15]]
 ===== yum Install From tak.gov
@@ -421,7 +429,9 @@ the "Set Me Up" menu option to retrieve it.
 
 Note::: Do NOT use your password as it the Token is more secure and cannot be used for logging in.
 Only for retrieving or publishing.
-Also: When you change the password of the given user, you will also need to retrieve the new token which is based on it and update the *baseurl* in the Takserver.repo file.
+Also: When you change the password of the given user,
+you will also need to retrieve the new token which is based on it
+and update the *baseurl* in the Takserver.repo file.
 
 Save the Takserver.repo file and then do the install of the takserver.
 
@@ -543,7 +553,7 @@ Disable the postgresql stream to install the specific postgres version we depend
 Enable the 'powertools' repo for postgis dependencies.
 Install TAK Server RPM database and its dependencies.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
@@ -562,7 +572,7 @@ Make sure the database RPM is in the current directory
 sudo dnf install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-8-47]]
 ====== RHEL 8
@@ -571,7 +581,7 @@ Setup the extra postgres yum repo for the latest postgres and postgis.
 Disable the postgresql stream to install the specific postgres version we depend on.
 Install TAK Server RPM database and its dependencies.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
@@ -583,7 +593,7 @@ sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms_
 ----
 
-include::note-system-no-repositories.adoc[]
+include::{fragdir}/note-system-no-repositories.adoc[]
 
 Make sure the database RPM is in the current directory
 
@@ -592,7 +602,7 @@ Make sure the database RPM is in the current directory
 sudo dnf install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-7-47]]
 ====== RHEL 7
@@ -601,7 +611,7 @@ Setup the extra postgres yum repo for the latest postgres and postgis.
 Install OpenJDK 17 and other dependencies.
 Install TAK Server RPM database.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
@@ -613,7 +623,7 @@ sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
 Make sure the database RPM is in the current directory
 
@@ -622,7 +632,7 @@ Make sure the database RPM is in the current directory
 sudo rpm -ivh takserver-database-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[ubuntu-raspberry-pi-os-31]]
 ====== Ubuntu & Raspberry Pi OS
@@ -632,13 +642,14 @@ Install TAK Server database.
 **Use database DEB.
 **Configure TAK Server Database installation
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
 sudo mkdir -p /etc/apt/keyrings
 sudo curl https://www.postgresql.org/media/keys/ACCC4CF8.asc --output /etc/apt/keyrings/postgresql.asc
-sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/postgresql.list'
+echo "deb [signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" \
+  sudo tee /etc/apt/sources.list.d/postgresql.list
 sudo apt update
 sudo apt install _takserver-database-5.1-RELEASEx_all.deb
 ----
@@ -651,7 +662,7 @@ This password will be used to configure the Core Server.
 <connection url="jdbc:postgresql://127.0.0.1:5432/cot" username="martiuser" password="*Database_password*" />_
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[centos-7-47]]
 ====== CentOS 7
@@ -660,7 +671,7 @@ Setup the extra postgres yum repo for the latest postgres and postgis.
 Install OpenJDK 17 and other dependencies.
 Install TAK Server RPM database.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 
 [source,shell]
@@ -673,7 +684,7 @@ sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
 Make sure the database RPM is in the current directory
 
@@ -682,7 +693,7 @@ Make sure the database RPM is in the current directory
 sudo yum install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[server-two-core-server-7]]
 ==== Server Two: Core Server
@@ -711,7 +722,7 @@ sudo dnf install checkpolicy
 cd /opt/tak && sudo ./apply-selinux.sh && sudo semodule -l | grep takserver
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-8-79]]
 ====== RHEL 8
@@ -724,7 +735,7 @@ sudo dnf install checkpolicy
 cd /opt/tak && sudo ./apply-selinux.sh && sudo semodule -l | grep takserver
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-7-79]]
 ====== RHEL 7
@@ -734,34 +745,32 @@ Install postgres yum repository (required in order to install up-to-date Postgre
 Install OpenJDK 17 and other dependencies.
 Install Tak server.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm[https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm_]__ -__y
-sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y _
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -y
+sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo yum install -y postgis33_15 postgis33_15-utils
 sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 sudo rpm -ivh takserver-core-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[ubuntu-raspberry-pi-os-63]]
 ====== Ubuntu & Raspberry Pi OS
-:debian_ctx:
 
 [source,shell]
 ----
 sudo apt install takserver-core-5.1-RELEASEx_all.deb
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-deb.adoc[]
 
-:!debian_ctx:
 
 [[centos-7-79]]
 ====== CentOS 7
@@ -771,20 +780,20 @@ Install postgres yum repository (required in order to install up-to-date Postgre
 Install OpenJDK 17 and other dependencies.
 Install Tak server.
 
-include::note-install-postgres.adoc[]
+include::{fragdir}/note-install-postgres.adoc[]
 
 [source,shell]
 ----
 sudo yum install epel-release -y
-sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y _
+sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo yum install -y postgis33_15 postgis33_15-utils
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 sudo rpm -ivh takserver-core-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[yum-install-from-tak.gov-47]]
 ====== yum Install From tak.gov
@@ -821,7 +830,8 @@ that can be retrieved by that user using the "Set Me Up" menu option to retrieve
 
 Note::: Do NOT use your password as it the Token is more secure and cannot be used for logging in.
 Only for retrieving or publishing.
-Note::: When you change the password of the given user, you will also need to retrieve the new token which is based on it and update the *baseurl* in the Takserver.repo file.
+Note::: When you change the password of the given user,
+you will also need to retrieve the new token which is based on it and update the *baseurl* in the Takserver.repo file.
 
 Save the Takserver.repo file and then do the install of the takserver.
 
@@ -952,7 +962,8 @@ Use of unencrypted ports should be avoided to ensure a secure TAK Server deploym
 
 image:media/Pictures/welcome-to-tak.png[welcome-to-tak,width=557,height=453]
 
-Followed by the recommended federation configuration, if you wish to set up your TAK Server to support federation. (For more information on federation, go to section 8):
+Followed by the recommended federation configuration, if you wish to set up your TAK Server to support federation.
+(For more information on federation, go to section 8):
 
 image:media/Pictures/welcome-to-tak-2.png[welcome-to-tak-2,width=626,height=496]
 
@@ -978,7 +989,7 @@ Enable PowerTools (needed for dependencies of postgis.) Install TAK server.
 [source,shell]
 ----
 sudo dnf install epel-release -y
-sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm _
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 sudo dnf -qy module disable postgresql && sudo dnf update -y
 sudo dnf install java-17-openjdk-devel -y
 sudo dnf config-manager --set-enabled powertools
@@ -990,7 +1001,7 @@ _Upgrade Tak server_
 sudo dnf install takserver-5.1-RELEASEx.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-8-95]]
 ===== RHEL 8 
@@ -1002,7 +1013,7 @@ Install TAK Server RPM database and its dependencies._
 
 [source,shell]
 ----
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm[https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm_] -y 
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y 
 sudo dnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo dnf update -y && sudo dnf install java-17-openjdk-devel -y
 sudo dnf module disable postgresql
@@ -1010,7 +1021,7 @@ sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms_
 ----
 
-include::note-system-no-repositories.adoc[]
+include::{fragdir}/note-system-no-repositories.adoc[]
 
 _Upgrade Tak server_
 
@@ -1019,14 +1030,15 @@ _Upgrade Tak server_
 sudo dnf install takserver-5.1-RELEASEx.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-7-95]]
 ===== RHEL 7
 
 If you have not previously done so,
 install EPEL (EPEL provides certain dependencies required by PostgreSQL.)
-Install postgres yum repository (required in order to install up-to-date Postgresql and PostGIS packages.) Install OpenJDK 17 and other dependencies.
+Install postgres yum repository (required in order to install up-to-date Postgresql and PostGIS packages.)
+Install OpenJDK 17 and other dependencies.
 Upgrade TAK server
 
 [source,shell]
@@ -1039,13 +1051,12 @@ sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_
 sudo rpm -Uvh takserver-5.1-RELEASEx.noarch.rpm --nodeps
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[ubuntu-and-raspberry-pi-os-31]]
 ===== Ubuntu and Raspberry Pi OS
-:deb_ctx:
 
 _Upgrade Tak server_
 [source,shell]
@@ -1053,16 +1064,16 @@ _Upgrade Tak server_
 sudo apt install ./takserver-5.1-RELEASEx_all.deb
 ----
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-deb.adoc[]
 
-:!deb_ctx:
 
 [[centos-7-95]]
 ===== Centos 7
 
 If you have not previously done so,
 install EPEL (EPEL provides certain dependencies required by PostgreSQL.)
-Install postgres yum repository (required in order to install up-to-date Postgresql and PostGIS packages.) Install OpenJDK 17 and other dependencies.
+Install postgres yum repository (required in order to install up-to-date Postgresql and PostGIS packages.)
+Install OpenJDK 17 and other dependencies.
 Upgrade Tak server.
 [source,shell]
 ----
@@ -1074,9 +1085,9 @@ sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_
 sudo rpm -Uvh takserver-5.1-RELEASEx.noarch.rpm --nodeps_
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 
 [[two-server-upgrade-7]]
@@ -1120,11 +1131,11 @@ Make sure the database RPM is in the current directory.
 sudo dnf install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::update-postgresql-v15.adoc[]
+include::{fragdir}/update-postgresql-v15.adoc[]
 
 
 In *both* servers.
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[rhel-8-111]]
 ===== RHEL 8
@@ -1138,14 +1149,15 @@ sudo dnf update -y && sudo dnf install java-17-openjdk-devel -y
 sudo dnf install takserver-core-5.1-RELEASEx.noarch.rpm -y
 ----
 
-_*Next*, on the database server, upgrade the database._ _Setup the extra postgres yum repo for the latest postgres and postgis.
+_*Next*, on the database server, upgrade the database._
+_Setup the extra postgres yum repo for the latest postgres and postgis.
 Install Java 17.
 Disable the postgresql stream to install the specific postgres version we depend on.
 Install TAK Server RPM database and its dependencies._
 
 [source,shell]
 ----
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm[https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm_] -y
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y
 sudo dnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo dnf update -y && sudo dnf install java-17-openjdk-devel -y
 sudo dnf module disable postgresql
@@ -1153,7 +1165,7 @@ sudo subscription-manager config --rhsm.manage_repos=1
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms_
 ----
 
-include::note-system-no-repositories.adoc[]
+include::{fragdir}/note-system-no-repositories.adoc[]
 
 Make sure the database RPM is in the current directory
 
@@ -1162,11 +1174,11 @@ Make sure the database RPM is in the current directory
 sudo dnf install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
 
-include::update-postgresql-v15.adoc[]
+include::{fragdir}/update-postgresql-v15.adoc[]
 
 
 _In *both* servers_
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 
 [[rhel-7-111]]
@@ -1181,7 +1193,7 @@ sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 ----
 
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
 Upgrade the two TAK Server packages on the servers on which they are installed.
 
@@ -1199,7 +1211,7 @@ Install TAK Server RPM database and its dependencies.
 
 [source,shell]
 ----
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm[https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm_]
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 sudo yum update -y
 ----
@@ -1210,10 +1222,10 @@ Make sure the database RPM is in the current directory
 ----
 sudo rpm -Uvh takserver-database-5.1-RELEASEx.noarch.rpm --nodeps
 ----
-include::update-postgresql-v15.adoc[]
+include::{fragdir}/update-postgresql-v15.adoc[]
 
 _In both servers_
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[ubuntu-and-raspberry-pi-os-47]]
 ===== Ubuntu and Raspberry Pi OS
@@ -1231,10 +1243,10 @@ sudo apt install ./takserver-core_5.1-RELEASE-x_all.deb
 ----
 sudo apt install ./takserver-database_5.1-RELEASE-x_all.deb
 ----
-include::update-postgresql-v15.adoc[]
+include::{fragdir}/update-postgresql-v15.adoc[]
 
 _In both servers_
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[centos-7-111]]
 ===== _*_Centos 7_*_
@@ -1247,7 +1259,7 @@ sudo yum install -y postgis33_15 postgis33_15-utils
 sudo yum install -y postgresql15-server postgresql15-contrib
 sudo yum install -y https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.rpm
 ----
-include::note-yum-no-jdk17.adoc[]
+include::{fragdir}/note-yum-no-jdk17.adoc[]
 
 Upgrade the two TAK Server packages on the servers on which they are installed.
 _*First*_, upgrade the core package:
@@ -1272,10 +1284,10 @@ Make sure the database RPM is in the current directory
 ----
 sudo yum install takserver-database-5.1-RELEASE-x.noarch.rpm --setopt=clean_requirements_on_remove=false -y
 ----
-include::update-postgresql-v15.adoc[]
+include::{fragdir}/update-postgresql-v15.adoc[]
 
 _In *both* servers_
-include::check-java-version.adoc[]
+include::{fragdir}/check-java-version-rh.adoc[]
 
 [[containerized-installation-docker-3]]
 === Containerized Installation (Docker)
@@ -1358,13 +1370,17 @@ or only within the container.
 +
 [source,shell]
 ----
-docker run -d -v <absolute path to takserver database directory>:/var/lib/postgresql/data:z -v $(pwd)/tak:/opt/tak:z -it -p 5432:5432 --network takserver-"$(cat tak/version.txt)" --network-alias tak-database --name takserver-db-"$(cat tak/version.txt)" takserver-db:"$(cat tak/version.txt)"
+docker run -d -v <absolute path to takserver database directory>:/var/lib/postgresql/data:z \
+  -v $(pwd)/tak:/opt/tak:z -it -p 5432:5432 --network takserver-"$(cat tak/version.txt)" \
+  --network-alias tak-database --name takserver-db-"$(cat tak/version.txt)" \
+  takserver-db:"$(cat tak/version.txt)"
 ----
     b. To run TAK server database with container only persistence
 +
 [source,shell]
 ----
-docker run -d -v $(pwd)/tak:/opt/tak:z -it -p 5432:5432 --network takserver-"$(cat tak/version.txt)" --network-alias tak-database --name takserver-db-"$(cat tak/version.txt)" takserver-db:"$(cat tak/version.txt)"
+docker run -d -v $(pwd)/tak:/opt/tak:z -it -p 5432:5432 --network takserver-"$(cat tak/version.txt)" \
+  --network-alias tak-database --name takserver-db-"$(cat tak/version.txt)" takserver-db:"$(cat tak/version.txt)"
 ----
 
 ===== TAK Server Container Setup:
@@ -1382,7 +1398,10 @@ docker build -t takserver:"$(cat tak/version.txt)" -f docker/Dockerfile.takserve
 +
 [source,shell]
 ----
-docker run -d -v $(pwd)/tak:/opt/tak:z -it -p 8089:8089 -p 8443:8443 -p 8444:8444 -p 8446:8446 -p 9000:9000 -p 9001:9001 --network takserver-"$(cat tak/version.txt)" --name takserver-"$(cat tak/version.txt)" takserver:"$(cat tak/version.txt)"
+docker run -d -v $(pwd)/tak:/opt/tak:z -it \
+  -p 8089:8089 -p 8443:8443 -p 8444:8444 -p 8446:8446 -p 9000:9000 -p 9001:9001 \
+  --network takserver-"$(cat tak/version.txt)" --name takserver-"$(cat tak/version.txt)" \
+  takserver:"$(cat tak/version.txt)"
 ----
 3.**Before using the TAK Server, you must set-up the certificates for secure operation.**
   If you have already configured certificates you can skip this step.
@@ -1429,7 +1448,8 @@ Create admin client certificate for access on secure port 8443 (https):
 +
 [source,shell]
 ----
-docker exec takserver-"$(cat tak/version.txt)" bash -c "cd /opt/tak/ && java -jar utils/UserManager.jar certmod -A certs/files/<client cert>.pem"
+docker exec takserver-"$(cat tak/version.txt)" \
+  bash -c "cd /opt/tak/ && java -jar utils/UserManager.jar certmod -A certs/files/<client cert>.pem"
 ----
 
 ===== Hardened TAK Server Setup:
@@ -1451,7 +1471,9 @@ Run all commands in this section from the root of the unzipped hardened docker c
 +
 [source,shell]
 ----
-docker build -t ca-setup-hardened --build-arg ARG_CA_NAME=<CA_NAME> --build-arg ARG_STATE=<ST> --build-arg ARG_CITY=<CITY> --build-arg ARG_ORGANIZATIONAL_UNIT=<UNIT> -f docker/Dockerfile.ca .
+docker build -t ca-setup-hardened --build-arg ARG_CA_NAME=<CA_NAME> --build-arg ARG_STATE=<ST> \
+  --build-arg ARG_CITY=<CITY> --build-arg ARG_ORGANIZATIONAL_UNIT=<UNIT> \
+  -f docker/Dockerfile.ca .
 ----
 2. Run the Certificate Authority Setup Container:
    If certificates have previously been generated and exist in
@@ -1529,7 +1551,9 @@ docker build -t tak-database-hardened:"$(cat tak/version.txt)" -f docker/Dockerf
 +
 [source,shell]
 ----
-docker run --name tak-database-hardened-"$(cat tak/version.txt)" --network takserver-net-hardened-"$(cat tak/version.txt)" --network-alias tak-database -d tak-database-hardened:"$(cat tak/version.txt)" -p 5432:5432
+docker run --name tak-database-hardened-"$(cat tak/version.txt)" \
+  --network takserver-net-hardened-"$(cat tak/version.txt)" --network-alias tak-database \
+  -d tak-database-hardened:"$(cat tak/version.txt)" -p 5432:5432
 ----
 
 ===== TAK Server Hardened Container Setup
@@ -1544,7 +1568,10 @@ docker build -t takserver-hardened:"$(cat tak/version.txt)" -f docker/Dockerfile
 +
 [source,shell]
 ----
-docker run --name takserver-hardened-"$(cat tak/version.txt)" --network takserver-net-hardened-"$(cat tak/version.txt)" -p 8089:8089 -p 8443:8443 -p 8444:8444 -p 8446:8446 -t -d takserver-hardened:"$(cat tak/version.txt)"
+docker run --name takserver-hardened-"$(cat tak/version.txt)" \
+  --network takserver-net-hardened-"$(cat tak/version.txt)" \
+  -p 8089:8089 -p 8443:8443 -p 8444:8444 -p 8446:8446 \
+  -t -d takserver-hardened:"$(cat tak/version.txt)"
 ----
 
 ====== Configuring Certificates
@@ -1553,14 +1580,16 @@ docker run --name takserver-hardened-"$(cat tak/version.txt)" --network takserve
 +
 [source,shell]
 ----
-docker exec -it ca-setup-hardened bash -c "openssl x509 -noout -fingerprint -md5 -inform pem -in files/admin.pem | grep -oP 'MD5 Fingerprint=\K.*'"
+docker exec -it ca-setup-hardened \
+  bash -c "openssl x509 -noout -fingerprint -md5 -inform pem -in files/admin.pem | grep -oP 'MD5 Fingerprint=\K.*'"
 ----
 2. Add the certificate fingerprint as the admin after the hardened TAK server container has started
 (about 60 seconds)
 +
 [source,shell]
 ----
-docker exec -it takserver-hardened-"$(cat tak/version.txt)" bash -c 'java -jar /opt/tak/utils/UserManager.jar usermod -A -f <admin cert fingerprint> admin'
+docker exec -it takserver-hardened-"$(cat tak/version.txt)" \
+  bash -c 'java -jar /opt/tak/utils/UserManager.jar usermod -A -f <admin cert fingerprint> admin'
 ----
 
 ===== Useful Commands
@@ -1795,7 +1824,10 @@ would have the effect of making every CoT event that came into the 'stdudp' inpu
 be associated with the "TEST1" group _instead of_ the anonymous group.
 If there is no filtergroup specified, the default is the old behavior, which is a special anonymous group.
 The anonymous group has a name "__ANON__" that can be used to explicitly add it back in if needed.
-The filtergroup option can be used with the streaming input protocols as well (stcp, tls), the effect of which is that any subscriptions made by connecting to that port inherit the filter group from the input. <filtergroup> cannot be used in conjunction with the "auth" attribute on the same input.
+The filtergroup option can be used with the streaming input protocols as well (stcp, tls),
+the effect of which is that any subscriptions made by connecting to that port
+inherit the filter group from the input.
+<filtergroup> cannot be used in conjunction with the "auth" attribute on the same input.
 You can however use them on separate inputs, for example:
 
 [source,xml]
@@ -1866,15 +1898,19 @@ CN=jkirk, O=TAK, C=US
 ----
 
 The CN value *jkirk* will be used as the username.
-The process for deciding which authentication backend to use depends on whether or not an Active Directory (AD) LDAP configuration is present in CoreConfig.xml.
+The process for deciding which authentication backend to use depends on
+whether an Active Directory (AD) LDAP configuration is present in CoreConfig.xml.
 Valid service account credentials must be configured in CoreConfig.xml.
 If AD authentication is configured, the user account is matched by the *sAMAccountName* LDAP attribute.
 At client authentication time, if groups are found in AD for the user, those groups are used by TAK Server.
 If no groups are found, the flat-file authentication backend is searched for a match on the username.
 If no groups are found for the user in either repository, the user is assigned to the "__ANON__" group.
 
-When configuring the input, a TLS input with an auth type of *x509* directs TAK Server to use the client certificate for both authentication and group assignment.
-On the input configuration, the on or example, this input definition specifies streaming TCP encrypted with TLS, authenticating the user with a client certificate and also requiring an authentication message, and using the LDAP authentication backend:
+When configuring the input, a TLS input with an auth type of *x509* directs TAK Server
+to use the client certificate for both authentication and group assignment.
+On the input configuration, the on or example, this input definition specifies streaming TCP encrypted with TLS,
+authenticating the user with a client certificate and also requiring an authentication message,
+and using the LDAP authentication backend:
 
 [source,xml]
 ----
@@ -2067,7 +2103,7 @@ To do this, first go the Configuration > Manage Federates page.
 If federation is not yet enabled, click on the Edit Configuration button.
 This is also where you can pick the ports for each federation protocol.
 
-image:media/Pictures/federate-config-status.png[media/Pictures/100000010000041D0000022758DEA5D1,width=558,height=292]
+image:media/Pictures/federate-config-status.png["Federate Config Status",width=558,height=292]
 
 Do not forget to restart the server after changing the federation configuration
 in order for the changes to take effect!
@@ -2081,9 +2117,13 @@ One of the key components to how TAK Server satisfies all the restrictions
 is that we use one trust-store for local users, and one for Federates.
 The trust-store contains all the valid CAs that you will allow client certificates from.
 By having separate trust-stores, we can have the Federation channels
-allow connections with certificates from "outside" CAs, while not allowing ATAKs with certs from those "outside" CAs to make direct connections to our server.
+allow connections with certificates from "outside" CAs,
+while not allowing ATAKs with certs from those "outside" CAs to make direct connections to our server.
 
-image:media/Pictures/federate-cert-auth.png[media/Pictures/100000010000041D00000141DB327FFB,width=664,height=202]Generally, we share the public CA, which you can find at */opt/tak/cert/files/ca.pem*, via some third channel such as email or a USB drive.
+image:media/Pictures/federate-cert-auth.png["Federate Cert Auth",width=664,height=202]
+
+Generally, we share the public CA, which you can find at */opt/tak/cert/files/ca.pem*,
+via some third channel such as email or a USB drive.
 Once you have traded CAs, go the Manage Federate Certificate Authorities page
 and upload the CA of the federate you want to connect to.
 
@@ -2095,13 +2135,18 @@ we are ready to make the connection and start sharing.
 For this step, only ONE of the servers creates an outgoing connection to the other.
 If you are starting the connection, go back to the Manage Federates page where you enabled federation from step 1.
 You will now see three sections, Active Connections, Outgoing Connection Configuration, and Federate Configuration.
-To create an outgoing connection, click on the corresponding link, and enter in the address and port of the destination server.
-You can also pick the protocol version (make sure it is the right protocol for the port you are connecting to!), reconnection interval (how long between retries if the connection is lost), and whether or not the connection will be enabled on creation.
+To create an outgoing connection, click on the corresponding link,
+and enter the address and port of the destination server.
+You can also pick the protocol version (make sure it is the right protocol for the port you are connecting to!),
+reconnection interval (how long between retries if the connection is lost),
+and whether the connection will be enabled on creation.
 
 image:media/Pictures/tak-connections.png[media/Pictures/100000010000041D00000261B5AC35A9,width=664,height=384]
 
-Now that you have created and started a connection, you will notice that no information is yet flowing between federates.
-This is because you and your fellow federate must specify which filtering groups you will allow to flow out of and into your server.
+Now that you have created and started a connection,
+you will notice that no information is yet flowing between federates.
+This is because you and your fellow federate must specify which filtering groups
+you will allow to flow out of and into your server.
 To manage this, click on the Manage Groups link in the corresponding row of the Federate Configuration section.
 Here you can specify the groups, including the special __ANON__ group if you want.
 Once both servers have configured the groups, traffic will start to flow.
@@ -2117,7 +2162,8 @@ The** Federated Group Mapping **section is on the *Federate Groups* page.
 
 Groups are exchanged during active connections between Federates.
 The _remote_ groups will appear in the ‘Remote Group List’ drop down in the *Federated Group Mapping* section.
-Connected Federates must have Federated Group Mapping enabled in order for the Federates to exchange their respective _remote_ groups.
+Connected Federates must have Federated Group Mapping enabled
+in order for the Federates to exchange their respective _remote_ groups.
 This parameter is in the **Federation Configuration **section in the Configuration > Manage Federates page.
 
 To configure the end-to-end mapping, select a remote group and map it to a local Federate group.
@@ -2126,9 +2172,10 @@ A single remote group can be mapped to many local groups.
 Additionally, multiple end-to-end group mappings may be defined.
 With a group mapping configured, traffic from the remote group will only flow to the mapped local group(s).
 
-Note::: If no incoming traffic matches the remote groups configured, the federation traffic will fall back to the *Federate Group* scheme described previously.
+Note::: If no incoming traffic matches the remote groups configured,
+the federation traffic will fall back to the *Federate Group* scheme described previously.
 
-image:media/Pictures/federate-groups.png[media/Pictures/10000001000005A000000465EC0315DD,width=649,height=492]
+image:media/Pictures/federate-groups.png["Federate Groups",width=649,height=492]
 
 [[mission-federation-disruption-tolerance-3]]
 === Mission Federation Disruption Tolerance
@@ -2138,7 +2185,7 @@ Mission federation disruption tolerance will update each server
 with changes to federated missions that occurred during the disruption.
 To enable this feature, check the box in the Federation Configuration page:
 
-image:media/Pictures/enable-federate-tolerance.png[media/Pictures/1000000100000380000001D49FB13BDF,width=664,height=347]
+image:media/Pictures/enable-federate-tolerance.png["Enable Tolerance",width=664,height=347]
 
 Sending all the changes that occurred between disruptions could potentially take a lot of bandwidth,
 so by default, we limit the changes to those that occurred within the last 2 days.
@@ -2148,14 +2195,18 @@ If the Unlimited checkbox is checked, then all changes since the last disruption
 The 2 day limit can be changed to any length with the Send Changes Newer Than setting,
 and the period can be selected as days, hours, or seconds.
 
-image:media/Pictures/mission-filter.png[media/Pictures/1000000100000380000000FC9602EA96,width=664,height=186]It is also possible to override the global setting for a particular mission, if so desired.
+image:media/Pictures/mission-filter.png["Mission Filter",width=664,height=186]
+
+It is also possible to override the global setting for a particular mission, if so desired.
 
 For example, in the above image, we see that mission_2 will send updates up to over the last 10 days,
 mission_2 only over the last 12 hours, and mission_4 will send all updates since the last disruption.
 Any mission that is not listed, and any subsequently added mission,
 will follow the global setting of 2 days, as set above.
 
-image:media/Pictures/federate-config-clear.png[media/Pictures/100000010000024500000218F161D1BC,width=507,height=467]The Clear Federation Events button will reset the disruption history for federation.
+image:media/Pictures/federate-config-clear.png["Federate Config Clear",width=507,height=467]
+
+The Clear Federation Events button will reset the disruption history for federation.
 
 This means that on the next reconnection,
 the server will send the max allowed mission changes according
@@ -2177,7 +2228,7 @@ This can be changed by entering a new file type,
 clicking on the 'Add' button to add the entry,
 and clicking on the 'Save' button at the bottom of the Federation Configuration page.
 
-image:media/Pictures/data-package-filter.png[media/Pictures/1000000100000315000000EA2B612175,width=664,height=197]
+image:media/Pictures/data-package-filter.png["Data Package Filter",width=664,height=197]
 
 [[federation-example-3]]
 === Federation Example
@@ -2218,7 +2269,8 @@ image:media/Pictures/federate-model-2.png[Figure 2: Alternate Federation Example
 The TAK Server Metrics Dashboard is available in the Monitoring menu.
 The dashboard continuously renders the following information:
 
-_Server Start Time and Server Up Time_: This tell you when the server was turned on and how long it has been operating.
+_Server Start Time and Server Up Time_:
+This tell you when the server was turned on and how long it has been operating.
 
 _Clients Connected_: This tells you how many connections your client is currently servicing.
 This corresponds to the number of clients that are displayed in the client dashboard.
@@ -2244,10 +2296,19 @@ This table shows the name of the log files, and their function.
 [cols=",",]
 |===
 |Name of Log File | Purpose
-|takserver-messaging.log | Execution-level information about the messaging process, including client connection events, error messages and warnings.
-|takserver-api.log  |Execution-level information about the API process, including error messages and warnings.
-|takserver-messaging-console.log | Java Virtual Machine (JVM) informational messages and errors, for the messaging process.
-|takserver-api-console.log | Java Virtual Machine (JVM) informational messages and errors, for the API process.
+
+|takserver-messaging.log 
+| Execution-level information about the messaging process,
+including client connection events, error messages and warnings.
+
+|takserver-api.log  
+|Execution-level information about the API process, including error messages and warnings.
+
+|takserver-messaging-console.log 
+| Java Virtual Machine (JVM) informational messages and errors, for the messaging process.
+
+|takserver-api-console.log 
+| Java Virtual Machine (JVM) informational messages and errors, for the API process.
 |===
 
 [[group-filtering-for-multicast-networks-1]]
@@ -2280,13 +2341,15 @@ For example, to share multicast traffic with the tls/8089, configure your input 
 
 This same approach works for federations.
 You can __MCAST__ as an outboundGroup on any federates that you wanted to share multicast traffic with.
-Using the filtergroup approach allows for creation of input specific multicast groups, allowing control of how messages from multicast networks are routed.
+Using the filtergroup approach allows for creation of input specific multicast groups,
+allowing control of how messages from multicast networks are routed.
 
 
 [[oauth2-authentication-1]]
 == OAuth2 Authentication
 
-TAK Server provides OAuth2 Authorization and Resource server capabilities using the OAuth2 Password authentication flow.
+TAK Server provides OAuth2 Authorization and Resource server capabilities
+using the OAuth2 Password authentication flow.
 OAuth2 integration works with existing authentication back ends,
 allowing TAK Server to issue tokens backed by the File or LDAP authenticators.
 TAK Server issues JSON Web Tokens (JWT) signed by the server certificate,
@@ -2323,7 +2386,8 @@ Password complexity is checked to confirm compliance.
 
 - Create new user accounts in bulk with username following a pattern.
 System uses password generation mechanism to create passwords that meet TAK password complexity requirements.
-System produces output file with user/password combos as a one-time downloadable item, after which system forgets the un-hashed passwords.
+System produces output file with user/password combos as a one-time downloadable item,
+after which system forgets the un-hashed passwords.
 
 - Create new groups.
 
@@ -2333,33 +2397,33 @@ The below figure shows the main page of the User Management UI.
 The left panel lists all user accounts, which can be filtered using the Search box on the top.
 The right panel lists all existing groups, which can be filtered using the Search box on the top.
 
-image:media/Pictures/user-mgmt-welcome.png[media/Pictures/1000000100000CA80000077CE4828639,width=632,height=301]
+image:media/Pictures/user-mgmt-welcome.png["User Management Welcome",width=632,height=301]
 
 To change user’s password, click on the arrow right next to the username and select "Change password".
 
-image:media/Pictures/change-user-password.png[media/Pictures/1000000100000CA80000077CD38ACBFB,width=623,height=301]
+image:media/Pictures/change-user-password.png["Change User Password",width=623,height=301]
 
 To view/edit groups for a user account, click on the arrow right next to the username and select "View/Edit groups".
 You can drag the groups from the right panel and drop to one of the three boxes in the middle panel.
 Click on "Reset" button to bring the UI back to showing the current groups of the user.
 Click on "Update" button to update the groups of the user.
 
-image:media/Pictures/user-group-mgmt.png[media/Pictures/1000000100000CA80000079AD78C97E4,width=654,height=319]
+image:media/Pictures/user-group-mgmt.png["User Group Management",width=654,height=319]
 
 To delete an account, click on the arrow right next to the username and select "Delete User".
 You will be prompted to either confirm or cancel the action.
 
 To list all users in a group, click on the arrow right next to the group name and click on "List users".
 
-image:media/Pictures/list-users-in-group.png[media/Pictures/1000000100000CA80000077C85F75FB6,width=636,height=305]
+image:media/Pictures/list-users-in-group.png["List Users in Group",width=636,height=305]
 
 To create a new user, click on "Add User" on the menu bar.
 
-image:media/Pictures/add-new-user.png[media/Pictures/1000000100000CA80000077C049F1644,width=627,height=370]
+image:media/Pictures/add-new-user.png["Add New User",width=627,height=370]
 
 To create new users in bulk, click on "Add Users" on the menu bar.
 
-image:media/Pictures/create-new-users-in-bulk.png[media/Pictures/1000000100000CA80000077CDED6D35E,width=664,height=393]
+image:media/Pictures/create-new-users-in-bulk.png["Create Users in Bulk",width=664,height=393]
 
 [[data-retention-tool-1]]
 == Data Retention Tool
@@ -2396,7 +2460,8 @@ IA – Information Assurance
 IP – Internet Protocol
 
 IPv4 – Internet Protocol, version 4.
-The commonly-used version of IP, in which addresses consist of four integers from zero to 255 (inclusive), separated by periods, such as 192.168.123.4
+The commonly-used version of IP, in which addresses consist of four integers from zero to 255 (inclusive),
+separated by periods, such as 192.168.123.4
 
 JCE – Java Cryptography Extensions
 
@@ -2424,7 +2489,8 @@ UDP – User Datagram Protocol
 
 SSL – Secure Sockets Layer
 
-TAK – Team Awareness Kit, a mobile or desktop application that sends and receives real-time information through TAK Server.
+TAK – Team Awareness Kit, a mobile or desktop application that sends
+and receives real-time information through TAK Server.
 
 TLS – Transport Layer Security, a newer and more-secure protocol derived from SSL.
 The terms SSL and TLS are often used interchangeably.
@@ -2532,7 +2598,7 @@ specifying group-based filtering without requiring an authentication message:
 +
 [source,xml]
 ----
-<input _name="stdssl" protocol="tls" port="8089" auth="x509"/>_
+<input _name="stdssl" protocol="tls" port="8089" auth="x509"/>
 ----
 +
 You can change the port number if you want.
@@ -2600,10 +2666,11 @@ To configure TAK Server to proxy the CSR to MS CA, set the CA attribute to "Micr
 
 [source,xml]
 ----
-include::configs/certificate-signing.xml[]
+include::{config_dir}/certificate-signing.xml[]
 ----
 
-Prior to submitting a CSR, Clients query TAK Server for Relative Distinguished Names (RDNs) that need to go into the CSR.
+Prior to submitting a CSR, Clients query TAK Server for Relative Distinguished Names (RDNs)
+that need to go into the CSR.
 The nameEntries element in CoreConfig.xml specifies the required RDNs,
 giving the administrator control over generated certificates.
 The CN value in the CSR will be equal to the HTTP username.
@@ -2620,7 +2687,8 @@ The makeCert.sh script will produce a signing keystore when generating an interm
 Certificates signed by TAK Server will be valid for the specified validityDays,
 and will be signed using the algorithm specified by signatureAlg.
 
-The MicrosoftCAConfig element defines how TAK Server will connect to the Certificate Enrollment Services (CES) endpoint.
+The MicrosoftCAConfig element defines how TAK Server will connect
+to the Certificate Enrollment Services (CES) endpoint.
 The CES endpoint is defined by the svcUrl attribute.
 The CES endpoint must be configured to use Username/Password authentication,
 and by default will include 'UsernamePassword' in the URL.
@@ -2665,7 +2733,7 @@ sudo vim /var/lib/pgsql/15/data/postgresql.conf
 ----
 [source,ini]
 ----
-include::configs/postgresql.conf[]
+include::{config_dir}/postgresql.conf[]
 ----
 
 - Update pg_hba.conf.
@@ -2725,13 +2793,15 @@ Client keys and certificates named "martiuser" (by default) will be created in t
 - Test SSL connection using the generated client certificate:
 [source,bash]
 ----
-psql "host=127.0.0.1 port=5432 user=martiuser dbname=cot sslmode=verify-ca sslcert=files/martiuser.pem sslkey=files/martiuser.key sslrootcert=files/ca.pem"
+psql "host=127.0.0.1 port=5432 user=martiuser dbname=cot \
+   sslmode=verify-ca sslcert=files/martiuser.pem sslkey=files/martiuser.key sslrootcert=files/ca.pem"
 ----
 
 If you don’t want to verify the server’s credential:
 [source,bash]
 ----
-psql "host=127.0.0.1 port=5432 user=martiuser dbname=cot sslmode=require sslcert=files/martiuser.pem sslkey=files/martiuser.key"
+psql "host=127.0.0.1 port=5432 user=martiuser dbname=cot \
+   sslmode=require sslcert=files/martiuser.pem sslkey=files/martiuser.key"
 ----
 
 The sslmode "verify-ca" means "I want to be sure that I connect to a server that I trust."
@@ -2760,7 +2830,7 @@ Connect to Postgres:
 psql -d cot
 ----
 
-[source,postgresql]
+[source,text]
 ----
 # List all users/roles:
 \du

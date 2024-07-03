@@ -1,0 +1,14 @@
+
+Check Java version:
+[source,shell]
+----
+java -version
+----
+
+_This should tell you have 17.x.y._
+If the command tells you your Java version is not 17.x.y,
+then you can use the update-alternatives command to change it:
+[source,shell]
+----
+sudo update-alternatives --config java
+----
