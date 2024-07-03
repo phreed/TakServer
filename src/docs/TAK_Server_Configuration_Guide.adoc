@@ -1830,6 +1830,7 @@ inherit the filter group from the input.
 <filtergroup> cannot be used in conjunction with the "auth" attribute on the same input.
 You can however use them on separate inputs, for example:
 
+[pass]
 [source,xml]
 ----
 <input _name="stdudp" protocol="udp" port="8087">
