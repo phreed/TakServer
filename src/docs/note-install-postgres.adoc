@@ -1,0 +1,7 @@
+
+Note::: When installing postgres,
+you may run into issues related to the GPG key
+– if you need to update the key,
+you can modify the postgres installation command
+based on your operating system according to the guidelines here:
+https://yum.postgresql.org/news/pgdg-rpm-repo-gpg-key-update/

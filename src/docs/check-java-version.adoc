@@ -1,0 +1,23 @@
+
+Check Java version:
+[source,shell]
+----
+java -version
+----
+
+_This should tell you have 17.x.y._
+If the command tells you your Java version is not 17.x.y,
+ifdef::debian_ctx[]
+then you can use the update-alternatives command to change it:
+[source,shell]
+----
+sudo update-alternatives --config java
+----
+endif::[]
+ifndef::debian_ctx[]
+then you can use the alternatives command to change it:
+[source,shell]
+----
+sudo alternatives --config java
+----
+endif::[]

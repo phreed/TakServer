@@ -1,0 +1,3 @@
+Note::: If you get the error ‘This system has no repositories available through subscriptions’,
+you need to subscribe your system with
+`sudo subscription-manager register --username <your_username> --password <your_password> --auto-attach`.

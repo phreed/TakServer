@@ -1,0 +1,6 @@
+
+This command will make a copy of your existing Postgresql database and update it to version 15.
+If there is an issue with the upgraded database, you can fall back to the copy of the previous version.
+If the upgrade succeeds,
+there will be a `delete_old_cluster.sh` script automatically created
+that you can run to safely remove the previous version's data copy.

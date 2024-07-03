@@ -1,0 +1,3 @@
+Note:: The yum package manager does not currently support JDK 17 on RHEL 7.
+By installing the package manually, you will be responsible for future security updates.
+For a safer long-term solution, we recommend that you update your OS to RHEL 8 or Rocky Linux 8.

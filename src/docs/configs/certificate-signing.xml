@@ -1,0 +1,21 @@
+<certificateSigning CA="\{TAKServer | MicrosoftCA}">
+  <certificateConfig>
+    <nameEntries>
+      <nameEntry name="O" value="Test Org Name"/>
+      <nameEntry name="OU" value="Test Org Unit Name"/>
+    </nameEntries>
+  </certificateConfig>
+  <TAKServerCAConfig
+          keystore="JKS"
+          keystoreFile="../certs/files_intCA/intermediate-ca-signing.jks"
+          keystorePass="atakatak"
+          validityDays="30"
+          signatureAlg="SHA256WithRSA"/>
+  <MicrosoftCAConfig
+          username="\{MS CA Username}"
+          password="\{MS CA Password}"
+          truststore="/opt/tak/certs/files_MSCA/keystore.jks"
+          truststorePass="atakatak"
+          svcUrl="https://win-kbtud3n1hjl.tak.net/tak-WIN-KBTUD3N1HJL-CA_CES_UsernamePassword/service.svc"
+          templateName="Copy of User"/>
+</certificateSigning>
