@@ -1,0 +1,201 @@
+@startuml
+!define RECTANGLE class
+
+package "Client Layer" {
+    RECTANGLE WebClient {
+        +Browser
+        +WebTAK UI
+        +HTTPS Connection
+    }
+
+    RECTANGLE MobileClient {
+        +ATAK/iTAK
+        +Certificate Auth
+        +SSL/TLS Connection
+    }
+
+    RECTANGLE APIClient {
+        +REST Client
+        +Token Auth
+        +OAuth Integration
+    }
+}
+
+package "Security Gateway" {
+    RECTANGLE SSLTermination {
+        +Certificate Validation
+        +TLS Handshake
+        +Cipher Suite Selection
+    }
+
+    RECTANGLE AuthenticationLayer {
+        +Certificate Authentication
+        +Token Validation
+        +LDAP Integration
+        +Username/Password
+    }
+
+    RECTANGLE AuthorizationLayer {
+        +Role-Based Access Control
+        +Group Membership
+        +Resource Permissions
+        +Policy Enforcement
+    }
+}
+
+package "Security Services" {
+    RECTANGLE SecurityAuthenticationApi {
+        +Login/Logout
+        +Session Management
+        +Authentication Status
+    }
+
+    RECTANGLE TokenApi {
+        +OAuth Token Management
+        +API Key Generation
+        +Token Validation
+        +Refresh Tokens
+    }
+
+    RECTANGLE GroupsApi {
+        +Group Management
+        +Role Assignment
+        +Permission Matrix
+        +Access Control Lists
+    }
+
+    RECTANGLE LDAPApi {
+        +LDAP Integration
+        +Directory Services
+        +User Synchronization
+        +Group Mapping
+    }
+}
+
+package "Core Security Components" {
+    RECTANGLE UserManager {
+        +User Account Management
+        +Password Policies
+        +Account Lockout
+        +Profile Management
+    }
+
+    RECTANGLE SessionManager {
+        +Session Creation
+        +Session Validation
+        +Session Timeout
+        +Concurrent Sessions
+    }
+
+    RECTANGLE PermissionEngine {
+        +Permission Resolution
+        +Access Decision
+        +Policy Evaluation
+        +Audit Logging
+    }
+}
+
+package "Data Protection" {
+    RECTANGLE DataEncryption {
+        +Data at Rest Encryption
+        +Database Encryption
+        +File System Encryption
+    }
+
+    RECTANGLE TransmissionSecurity {
+        +Message Encryption
+        +Digital Signatures
+        +Integrity Checking
+    }
+
+    RECTANGLE KeyManagement {
+        +Certificate Management
+        +Key Rotation
+        +PKI Integration
+        +Key Storage
+    }
+}
+
+package "Audit and Monitoring" {
+    RECTANGLE SecurityAudit {
+        +Access Logging
+        +Authentication Events
+        +Authorization Decisions
+        +Security Violations
+    }
+
+    RECTANGLE SecurityMonitoring {
+        +Intrusion Detection
+        +Anomaly Detection
+        +Threat Assessment
+        +Alert Generation
+    }
+}
+
+package "Federation Security" {
+    RECTANGLE FederationAuth {
+        +Inter-server Authentication
+        +Certificate Validation
+        +Trust Relationships
+    }
+
+    RECTANGLE FederationPolicy {
+        +Data Sharing Policies
+        +Cross-domain Rules
+        +Security Constraints
+        +Trust Boundaries
+    }
+}
+
+' Client to Gateway Flow
+WebClient --> SSLTermination : HTTPS
+MobileClient --> SSLTermination : SSL/TLS
+APIClient --> SSLTermination : HTTPS
+
+' Authentication Flow
+SSLTermination --> AuthenticationLayer : Validated Connection
+AuthenticationLayer --> SecurityAuthenticationApi : Certificate/Token
+AuthenticationLayer --> TokenApi : Token Validation
+AuthenticationLayer --> LDAPApi : LDAP Lookup
+AuthenticationLayer --> UserManager : User Verification
+
+' Authorization Flow
+AuthenticationLayer --> AuthorizationLayer : Authenticated User
+AuthorizationLayer --> GroupsApi : Group Membership
+AuthorizationLayer --> PermissionEngine : Permission Check
+AuthorizationLayer --> SessionManager : Session Creation
+
+' Security Services Integration
+UserManager <--> SessionManager : User Sessions
+SessionManager <--> PermissionEngine : Access Control
+PermissionEngine --> SecurityAudit : Decision Logging
+
+' Data Protection Integration
+UserManager --> DataEncryption : User Data Protection
+SessionManager --> KeyManagement : Session Keys
+PermissionEngine --> TransmissionSecurity : Message Security
+
+' Monitoring Integration
+SecurityAuthenticationApi --> SecurityAudit : Auth Events
+TokenApi --> SecurityAudit : Token Events
+GroupsApi --> SecurityAudit : Permission Changes
+LDAPApi --> SecurityAudit : Directory Access
+
+SecurityAudit --> SecurityMonitoring : Event Analysis
+SecurityMonitoring --> SecurityAudit : Alert Feedback
+
+' Federation Security
+AuthenticationLayer --> FederationAuth : Inter-server Auth
+AuthorizationLayer --> FederationPolicy : Cross-domain Policy
+FederationAuth --> KeyManagement : Federation Certificates
+FederationPolicy --> PermissionEngine : Policy Enforcement
+
+' Security Notes
+note right of AuthenticationLayer : Multiple authentication\nmethods supported:\n- X.509 Certificates\n- OAuth Tokens\n- LDAP Credentials\n- Username/Password
+
+note bottom of AuthorizationLayer : Fine-grained access control:\n- Resource-level permissions\n- Role-based access\n- Group-based access\n- Time-based restrictions
+
+note left of DataEncryption : End-to-end security:\n- TLS for transmission\n- AES for data at rest\n- Digital signatures\n- Key rotation
+
+note top of SecurityMonitoring : Real-time monitoring:\n- Failed login attempts\n- Privilege escalation\n- Unusual access patterns\n- Security policy violations
+@enduml

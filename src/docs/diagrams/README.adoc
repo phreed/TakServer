@@ -1,0 +1,127 @@
+= TAK Server Architecture Diagrams
+:doctype: article
+:toc: left
+:toclevels: 2
+:sectanchors:
+:sectlinks:
+
+== Overview
+
+This directory contains PlantUML diagrams that illustrate the TAK Server architecture.
+These diagrams are referenced from the main architecture documentation using AsciiDoc includes.
+
+== Available Diagrams
+
+=== System Architecture (`takserver-system-architecture.puml`)
+
+High-level system architecture diagram showing all major components and their relationships.
+
+*Components covered:*
+
+* TAK Server Core
+* Federation System
+* Plugin System
+* User Management
+* Data Management
+* Clustering
+* Web APIs
+
+*Usage:* Included in the main architecture guide's "System Architecture" section.
+
+=== Component Interaction Flow (`takserver-component-flow.puml`)
+
+Sequence diagram showing how messages flow through the system components.
+
+*Flow covered:*
+
+* Client request handling
+* Message processing pipeline
+* Plugin integration
+* Federation distribution
+* Database persistence
+
+*Usage:* Included in the "Component Interaction Flow" section.
+
+=== REST API Architecture (`takserver-rest-api-architecture.puml`)
+
+Detailed view of the REST API layer structure and organization.
+
+*Components covered:*
+
+* API Controllers hierarchy
+* Service layer integration
+* Data layer connections
+* Security integration
+* Client applications
+
+*Usage:* Included in the "REST API Layer" section.
+
+=== Plugin Architecture (`takserver-plugin-architecture.puml`)
+
+Detailed diagram of the plugin system architecture and interfaces.
+
+*Components covered:*
+
+* Plugin Manager
+* Plugin Interfaces (PluginDataApi, PluginMissionApi, etc.)
+* Plugin Services
+* Core System Integration
+* Plugin Lifecycle
+
+*Usage:* Included in the "Plugin System" section.
+
+=== Federation Architecture (`takserver-federation-architecture.puml`)
+
+Comprehensive view of the federation system showing multiple TAK Server instances.
+
+*Components covered:*
+
+* Federation Hub components
+* Direct federation connections
+* Hub-and-spoke federation
+* Security and policy enforcement
+* Multi-instance communication
+
+*Usage:* Included in the "Federation System" section.
+
+=== Security Architecture (`takserver-security-architecture.puml`)
+
+Security-focused diagram showing authentication, authorization, and data protection.
+
+*Components covered:*
+
+* Authentication methods
+* Authorization layers
+* Security services
+* Data protection
+* Audit and monitoring
+* Federation security
+
+*Usage:* Included in the "Security Architecture" section.
+
+== Generating Diagrams
+
+These PlantUML diagrams can be rendered using:
+
+* **AsciiDoc processors** with PlantUML support (like Asciidoctor with PlantUML extension)
+* **PlantUML command line tool**
+* **IDE plugins** (IntelliJ IDEA, VS Code, etc.)
+* **Online PlantUML servers**
+
+== Maintenance Notes
+
+When updating diagrams:
+
+1. Keep diagram complexity manageable
+2. Use consistent naming conventions
+3. Update the main architecture guide if component relationships change
+4. Validate that includes work properly in the main document
+5. Consider visual clarity when adding new components
+
+== File Conventions
+
+* Use `.puml` extension for PlantUML files
+* Use kebab-case naming (e.g., `takserver-component-name.puml`)
+* Start each diagram with `@startuml` and end with `@enduml`
+* Use consistent styling and colors where possible
+* Add explanatory notes for complex relationships

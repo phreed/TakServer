@@ -1,0 +1,142 @@
+@startuml
+!define RECTANGLE class
+
+package "TAK Server Core" {
+    RECTANGLE CoreSystem {
+        +ServerConfiguration
+        +DistributedCotMessenger
+        +DistributedTakMessenger
+    }
+
+    RECTANGLE PluginManager {
+        +PluginStarter
+        +PluginFileApiImpl
+        +PluginsLoadedEvent
+        +PluginsStartedEvent
+    }
+
+    RECTANGLE DistributedPluginAPIs {
+        +DistributedPluginCoreConfigApi
+        +DistributedPluginFileApi
+        +DistributedPluginMissionApi
+        +DistributedPluginDataFeedApi
+        +DistributedPluginSelfStopApi
+    }
+}
+
+package "Plugin Framework" {
+    interface PluginLifecycle {
+        +start()
+        +stop()
+    }
+
+    interface PluginDataApi {
+        +onSubmitData()
+        +onSubmitDataWithResult()
+        +onUpdateData()
+        +onRequestData()
+        +onDeleteData()
+        +onFileUploadEvent()
+    }
+
+    interface PluginMissionApi {
+        +getAllMissions()
+        +readMission()
+        +createMission()
+        +deleteMission()
+        +addMissionContent()
+        +removeMissionContent()
+    }
+
+    interface PluginFileApi {
+        +newFile()
+    }
+
+    interface PluginDataFeedApi {
+        +create()
+    }
+
+    interface PluginCoreConfigApi {
+        +getConfiguration()
+    }
+
+    interface SystemInfoApi {
+        +getTAKServerUrl()
+    }
+
+    interface PluginSelfStopApi {
+        +pluginSelfStop()
+    }
+}
+
+package "Plugin Implementations" {
+    RECTANGLE CustomPlugin1 {
+        <<Plugin>>
+        +Custom Logic
+        +Data Processing
+    }
+
+    RECTANGLE CustomPlugin2 {
+        <<Plugin>>
+        +External Integration
+        +API Calls
+    }
+
+    RECTANGLE CustomPlugin3 {
+        <<Plugin>>
+        +Data Transformation
+        +Analytics
+    }
+}
+
+package "Plugin Services" {
+    RECTANGLE PluginMessaging {
+        +Message Interception
+        +Event Notification
+        +Data Pipeline
+    }
+
+    RECTANGLE PluginUtilities {
+        +Common Functions
+        +Helper Methods
+        +Configuration Access
+    }
+
+    RECTANGLE PluginDataLayer {
+        +Database Access
+        +File Operations
+        +Cache Management
+    }
+}
+
+' Relationships
+CoreSystem --> PluginManager : manages
+PluginManager --> DistributedPluginAPIs : provides
+DistributedPluginAPIs --> PluginLifecycle : implements
+
+PluginLifecycle <|-- PluginDataApi
+PluginDataApi <|-- CustomPlugin1
+PluginDataApi <|-- CustomPlugin2
+PluginDataApi <|-- CustomPlugin3
+
+CustomPlugin1 --> PluginMissionApi : uses
+CustomPlugin1 --> PluginFileApi : uses
+CustomPlugin2 --> PluginDataFeedApi : uses
+CustomPlugin2 --> SystemInfoApi : uses
+CustomPlugin3 --> PluginCoreConfigApi : uses
+CustomPlugin3 --> PluginSelfStopApi : uses
+
+PluginManager --> PluginMessaging : coordinates
+PluginManager --> PluginUtilities : provides
+PluginManager --> PluginDataLayer : manages
+
+CustomPlugin1 --> PluginServices : utilizes
+CustomPlugin2 --> PluginServices : utilizes
+CustomPlugin3 --> PluginServices : utilizes
+
+note right of PluginLifecycle : Plugins implement this\ninterface for lifecycle\nmanagement
+
+note bottom of PluginDataApi : Core interface for\ndata processing\noperations
+
+note left of CustomPlugin1 : Example plugins\nshowing different\nintegration patterns
+@enduml

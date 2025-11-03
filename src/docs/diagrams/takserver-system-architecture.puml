@@ -1,0 +1,150 @@
+@startuml
+!define RECTANGLE class
+
+package "TAK Server Core" {
+    RECTANGLE TakServerCore {
+        +ServerConfiguration
+        +MessageProcessor
+        +DistributedCotMessenger
+        +DistributedTakMessenger
+    }
+
+    RECTANGLE MessagingLayer {
+        +CotEventContainer
+        +MessageConverter
+        +IgniteTopicBasedMessageProcessor
+    }
+
+    RECTANGLE ConfigurationManagement {
+        +CoreConfigFacade
+        +ProfileAPI
+        +ConfigAPI
+    }
+
+    RECTANGLE DataPersistence {
+        +PostgreSQL Database
+        +Hibernate JPA
+        +DataSource Management
+    }
+}
+
+package "Federation" {
+    RECTANGLE FederationHub {
+        +FederationNode
+        +FederationPolicyGraph
+        +Federate
+        +FederateEdge
+    }
+
+    RECTANGLE FederationBroker {
+        +Message Routing
+        +Policy Enforcement
+        +Connection Management
+    }
+
+    RECTANGLE FederationUI {
+        +Web Interface
+        +Configuration Management
+        +Monitoring
+    }
+}
+
+package "Plugin System" {
+    RECTANGLE PluginManager {
+        +PluginStarter
+        +PluginLifecycle
+        +Plugin Loading
+    }
+
+    RECTANGLE PluginAPIs {
+        +PluginDataApi
+        +PluginMissionApi
+        +PluginFileApi
+        +PluginCoreConfigApi
+    }
+
+    RECTANGLE PluginInstances {
+        +Custom Plugins
+        +Data Processing
+        +External Integration
+    }
+}
+
+package "User Management" {
+    RECTANGLE UserManager {
+        +Authentication
+        +Authorization
+        +User Accounts
+        +Group Management
+    }
+
+    RECTANGLE SecurityAPIs {
+        +SecurityAuthenticationApi
+        +LDAPApi
+        +TokenApi
+        +GroupsApi
+    }
+}
+
+package "Data Management" {
+    RECTANGLE RetentionService {
+        +Data Lifecycle
+        +Archive Management
+        +Cleanup Policies
+    }
+
+    RECTANGLE DataAPIs {
+        +DataFeedApi
+        +FileApi
+        +MissionApi
+        +MapLayersApi
+    }
+}
+
+package "Clustering" {
+    RECTANGLE ClusterManagement {
+        +Apache Ignite
+        +Distributed Caching
+        +Load Balancing
+        +High Availability
+    }
+}
+
+package "Web APIs" {
+    RECTANGLE RestAPIs {
+        +SubmissionApi
+        +ContactManagerApi
+        +CotQueryApi
+        +InjectionApi
+    }
+
+    RECTANGLE WebInterface {
+        +WebTAK UI
+        +Administrative Console
+        +Monitoring Dashboard
+    }
+}
+
+TakServerCore --> MessagingLayer
+TakServerCore --> ConfigurationManagement
+TakServerCore --> DataPersistence
+TakServerCore --> ClusterManagement
+
+FederationHub --> FederationBroker
+FederationBroker --> TakServerCore
+
+PluginManager --> PluginAPIs
+PluginAPIs --> PluginInstances
+PluginManager --> TakServerCore
+
+UserManager --> SecurityAPIs
+SecurityAPIs --> TakServerCore
+
+RetentionService --> DataAPIs
+DataAPIs --> TakServerCore
+
+RestAPIs --> TakServerCore
+WebInterface --> RestAPIs
+
+ClusterManagement --> TakServerCore
+@enduml

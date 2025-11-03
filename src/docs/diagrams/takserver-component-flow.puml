@@ -1,0 +1,20 @@
+@startuml
+participant Client
+participant "REST API" as API
+participant "TAK Server Core" as Core
+participant "Message Processor" as Processor
+participant "Plugin System" as Plugins
+participant "Federation Hub" as Federation
+participant Database
+
+Client -> API: HTTP Request
+API -> Core: Process Request
+Core -> Processor: Route Message
+Processor -> Database: Persist Data
+Processor -> Plugins: Notify Plugins
+Plugins -> Core: Plugin Response
+Core -> Federation: Federate Data
+Federation -> "External TAK Server": Forward Message
+Core -> API: Response
+API -> Client: HTTP Response
+@enduml

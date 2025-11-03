@@ -1,0 +1,603 @@
+= TAK Server Architecture Guide
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectanchors:
+:sectlinks:
+:sectnums:
+:source-highlighter: highlightjs
+
+== Overview
+
+TAK Server is a distributed, modular system designed to provide situational awareness capabilities through real-time data sharing, messaging, and collaboration.
+The architecture is built around a core messaging system with pluggable components for federation, user management, data retention, and extensibility.
+
+This document provides a comprehensive overview of the TAK Server architecture, including component descriptions, APIs, and system interactions.
+
+== System Architecture
+
+The TAK Server system is composed of multiple interconnected components that work together to provide a scalable and extensible platform.
+Each component has specific responsibilities and well-defined APIs for integration.
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-system-architecture.puml[]
+....
+
+== Core Components
+
+=== TAK Server Core (`takserver-core`)
+
+The core component is the heart of the TAK Server system.
+It provides the foundational services for message processing, configuration management, and system coordination.
+
+==== Key Classes
+
+* `ServerConfiguration`: Main configuration class that bootstraps the Spring Boot application
+* `MessageProcessor<T>`: Functional interface for processing messages
+* `DistributedCotMessenger`: Handles Cursor-on-Target (CoT) message distribution
+* `DistributedTakMessenger`: Manages general TAK message routing
+
+==== Core APIs
+
+The core component exposes several internal APIs for system integration:
+
+* `DistributedPluginCoreConfigApi`: Plugin configuration management
+* `DistributedPluginFileApi`: File handling for plugins
+* `DistributedPluginMissionApi`: Mission management for plugins
+
+=== Messaging Layer
+
+The messaging layer handles real-time communication between clients and system components.
+It is built on Apache Ignite for distributed messaging and caching.
+
+==== Message Types
+
+* **CoT Messages**: Cursor-on-Target messages for situational awareness
+* **Mission Data**: Mission-related information and updates
+* **File Transfers**: Binary data and file sharing
+* **Configuration Updates**: System configuration changes
+
+==== Key Components
+
+* `IgniteTopicBasedMessageProcessor`: Processes messages using Ignite topics
+* `MessageConverter`: Converts between different message formats
+* `CotEventContainer`: Container for CoT event data
+
+== REST API Layer
+
+The REST API layer provides HTTP-based access to TAK Server functionality.
+All REST controllers extend `BaseRestController` and use Spring Boot annotations.
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-rest-api-architecture.puml[]
+....
+
+=== Core REST APIs
+
+==== Configuration API (`ConfigAPI`)
+
+Manages system configuration settings.
+
+[source,java]
+----
+@RestController
+public class ConfigAPI extends BaseRestController {
+    // Configuration management endpoints
+}
+----
+
+**Endpoints:**
+- Configuration retrieval and updates
+- System settings management
+- Security configuration
+
+==== Submission API (`SubmissionApi`)
+
+Handles data submission and message injection into the system.
+
+[source,java]
+----
+@RestController
+public class SubmissionApi extends BaseRestController {
+    // Message submission endpoints
+}
+----
+
+**Endpoints:**
+- CoT message submission
+- File upload handling
+- Data injection
+
+==== Contact Manager API (`ContactManagerApi`)
+
+Manages contact information and presence data.
+
+[source,java]
+----
+@RestController
+public class ContactManagerApi extends BaseRestController {
+    // Contact management endpoints
+}
+----
+
+**Endpoints:**
+- Contact listing and search
+- Presence information
+- Contact groups
+
+=== Data Management APIs
+
+==== Data Feed API (`DataFeedApi`)
+
+Manages data feeds and streaming data sources.
+
+[source,java]
+----
+@RestController
+public class DataFeedApi extends BaseRestController {
+    // Data feed management
+}
+----
+
+**Key Features:**
+- Data feed creation and configuration
+- Stream management
+- Feed synchronization
+
+==== Mission API (via Plugin System)
+
+Mission management is primarily handled through the plugin system.
+
+[source,java]
+----
+public interface PluginMissionApi {
+    List<Mission> getAllMissions(boolean passwordProtected, boolean defaultRole, String tool);
+    Mission readMission(String name, boolean changes, boolean logs, Long secago, Date start, Date end);
+    Mission createMission(String nameParam, String creatorUidParam, String[] groupNamesParam, ...);
+    Mission deleteMission(String name, String creatorUid, boolean deepDelete);
+    // Additional mission operations
+}
+----
+
+==== File API
+
+File management through both REST endpoints and plugin interfaces.
+
+[source,java]
+----
+public interface PluginFileApi {
+    Metadata newFile(Metadata metadata, InputStream inputStream) throws Exception;
+    // File operations
+}
+----
+
+=== Security APIs
+
+==== Groups API (`GroupsApi`)
+
+Manages user groups and permissions.
+
+[source,java]
+----
+@RestController
+public class GroupsApi extends BaseRestController {
+    // Group management endpoints
+}
+----
+
+==== Authentication API (`SecurityAuthenticationApi`)
+
+Handles user authentication and session management.
+
+[source,java]
+----
+@RestController
+public class SecurityAuthenticationApi extends BaseRestController {
+    // Authentication endpoints
+}
+----
+
+==== Token API (`TokenApi`)
+
+Manages OAuth tokens and API keys.
+
+[source,java]
+----
+@RestController
+public class TokenApi extends BaseRestController {
+    // Token management endpoints
+}
+----
+
+== Federation System
+
+The federation system enables multiple TAK Server instances to share data securely across different networks and organizations.
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-federation-architecture.puml[]
+....
+
+=== Federation Components
+
+==== Federation Common (`federation-common`)
+
+Provides shared federation functionality and data structures.
+
+**Key Classes:**
+- `Federate`: Represents a federated endpoint
+- `FederationNode`: Node in the federation network
+- `FederationPolicyGraph`: Manages federation policies
+- `FederateEdge`: Connection between federation nodes
+
+==== Federation Hub Broker (`federation-hub-broker`)
+
+Manages message routing and policy enforcement between federated instances.
+
+**Responsibilities:**
+- Message filtering and routing
+- Security policy enforcement
+- Connection management
+- Load balancing
+
+==== Federation Hub Policy (`federation-hub-policy`)
+
+Handles policy management and enforcement for federation connections.
+
+**Features:**
+- Access control policies
+- Data sharing rules
+- Security constraints
+- Audit logging
+
+==== Federation Hub UI (`federation-hub-ui`)
+
+Provides a web-based interface for federation management.
+
+[source,java]
+----
+@RestController
+@RequestMapping("/")
+public class FederationHubUIService implements ApplicationListener<ContextRefreshedEvent> {
+    // Federation UI endpoints
+}
+----
+
+=== Federation API
+
+The federation system exposes APIs for:
+
+- Federation configuration
+- Connection status monitoring
+- Policy management
+- Message routing control
+
+== Plugin System
+
+The plugin system provides extensibility for custom functionality and third-party integrations.
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-plugin-architecture.puml[]
+....
+
+=== Plugin Architecture
+
+==== Plugin Manager (`takserver-plugin-manager`)
+
+Manages plugin lifecycle and provides plugin services.
+
+**Key Classes:**
+- `PluginStarter`: Initializes and starts plugins
+- `PluginFileApiImpl`: Implements file operations for plugins
+
+==== Plugin APIs (`takserver-plugins`)
+
+Defines interfaces for plugin development.
+
+===== Core Plugin Interfaces
+
+[source,java]
+----
+public interface PluginLifecycle extends PluginDataApi {
+    void start();
+    void stop();
+}
+----
+
+[source,java]
+----
+public interface PluginDataApi {
+    default void onSubmitData(Map<String, String> allRequestParams, String data, String contentType);
+    default PluginResponse onSubmitDataWithResult(Map<String, String> allRequestParams, String data, String contentType);
+    default void onUpdateData(Map<String, String> allRequestParams, String data, String contentType);
+    default PluginResponse onRequestData(Map<String, String> allRequestParams, String accept);
+    default void onDeleteData(Map<String, String> allRequestParams, String contentType);
+    default void onFileUploadEvent(Metadata metadata);
+}
+----
+
+===== Specialized Plugin APIs
+
+**Mission API:**
+[source,java]
+----
+public interface PluginMissionApi {
+    List<Mission> getAllMissions(boolean passwordProtected, boolean defaultRole, String tool) throws Exception;
+    Mission createMission(String nameParam, String creatorUidParam, String[] groupNamesParam, ...);
+    Mission deleteMission(String name, String creatorUid, boolean deepDelete) throws Exception;
+    // Additional mission operations
+}
+----
+
+**File API:**
+[source,java]
+----
+public interface PluginFileApi {
+    Metadata newFile(Metadata metadata, InputStream inputStream) throws Exception;
+}
+----
+
+**Data Feed API:**
+[source,java]
+----
+public interface PluginDataFeedApi {
+    PluginDataFeed create(String uuid, String name, List<String> tags, boolean archive, boolean sync, List<String> groups, boolean federated, boolean binaryPayloadWebsocketOnly);
+}
+----
+
+**Configuration API:**
+[source,java]
+----
+public interface PluginCoreConfigApi {
+    // Configuration access for plugins
+}
+----
+
+**System Information API:**
+[source,java]
+----
+public interface SystemInfoApi {
+    String getTAKServerUrl();
+}
+----
+
+== User Management System
+
+=== User Manager (`takserver-usermanager`)
+
+Handles user authentication, authorization, and account management.
+
+**Features:**
+- User account creation and management
+- Role-based access control
+- Integration with external authentication systems
+- Session management
+
+=== Authentication Methods
+
+- Certificate-based authentication
+- LDAP integration
+- OAuth token authentication
+- Username/password authentication
+
+== Data Management and Retention
+
+=== Common Data Layer (`takserver-common`)
+
+Provides shared data models and utilities used across all components.
+
+=== Retention Service (`takserver-retention`)
+
+Manages data lifecycle and retention policies.
+
+**Features:**
+- Automated data archival
+- Configurable retention policies
+- Data cleanup and purging
+- Storage optimization
+
+=== Schema Management (`takserver-schemamanager`)
+
+Handles database schema management and migrations.
+
+**Responsibilities:**
+- Database schema versioning
+- Migration execution
+- Schema validation
+- Database initialization
+
+== Clustering and High Availability
+
+=== Cluster Management (`takserver-cluster`)
+
+Provides clustering capabilities for high availability and scalability.
+
+**Technologies:**
+- Apache Ignite for distributed computing
+- Kubernetes deployment support
+- Load balancing
+- Failover management
+
+**Configuration:**
+- Cluster topology management
+- Node discovery
+- Data replication
+- Cache management
+
+== Protobuf Integration
+
+=== TAK Server Protobuf (`takserver-protobuf`)
+
+Provides Protocol Buffer definitions and generated classes for efficient serialization.
+
+**Usage:**
+- Message serialization
+- Network protocol definitions
+- Cross-language compatibility
+- Performance optimization
+
+== Administrative Tools
+
+=== Tool UI (`takserver-tool-ui`)
+
+Provides web-based administrative tools.
+
+**Features:**
+- System monitoring
+- Configuration management
+- User administration
+- Log viewing
+
+=== Testing Framework (`testing`)
+
+Comprehensive testing infrastructure for system validation.
+
+**Components:**
+- Integration testing
+- Performance testing
+- Load testing
+- API testing
+
+== Configuration Management
+
+Configuration is managed through multiple layers:
+
+1. **Core Configuration**: System-level settings
+2. **Profile Configuration**: Environment-specific settings
+3. **Plugin Configuration**: Plugin-specific settings
+4. **Federation Configuration**: Federation-specific settings
+
+=== Configuration APIs
+
+- `ConfigAPI`: REST endpoint for configuration management
+- `ProfileAPI`: Device and user profile management
+- `CoreConfigFacade`: Programmatic configuration access
+
+== Security Architecture
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-security-architecture.puml[]
+....
+
+=== Authentication Flow
+
+1. Client presents credentials (certificate, token, or username/password)
+2. Authentication service validates credentials
+3. User groups and permissions are determined
+4. Session or token is issued
+5. Subsequent requests are authorized based on session/token
+
+=== Authorization Model
+
+- **Role-Based Access Control (RBAC)**: Users are assigned roles with specific permissions
+- **Group-Based Access**: Users belong to groups with associated access rights
+- **Resource-Level Security**: Fine-grained access control for specific resources
+
+=== Security APIs
+
+- `SecurityAuthenticationApi`: Authentication management
+- `GroupsApi`: Group and permission management
+- `TokenApi`: Token-based authentication
+- `LDAPApi`: LDAP integration
+
+== Deployment Architecture
+
+=== Packaging (`takserver-package`)
+
+The packaging system creates deployable artifacts:
+
+- **Database Package**: Database setup and configuration
+- **Messaging Package**: Core messaging components
+- **API Package**: REST API layer
+- **Launcher Package**: Application startup components
+- **Federation Hub Package**: Federation components
+- **Main TAK Server Package**: Complete server bundle
+
+=== Deployment Options
+
+1. **Standalone Deployment**: Single server instance
+2. **Clustered Deployment**: Multiple coordinated instances
+3. **Federated Deployment**: Multiple autonomous instances with data sharing
+4. **Cloud Deployment**: Kubernetes-based deployment with auto-scaling
+
+== Component Interaction Flow
+
+[plantuml, format=svg]
+....
+include::diagrams/takserver-component-flow.puml[]
+....
+
+== Performance and Scalability
+
+=== Caching Strategy
+
+- **Apache Ignite**: Distributed caching and computing
+- **Spring Cache**: Application-level caching
+- **Caffeine Cache**: Local high-performance caching
+
+=== Message Processing
+
+- **Asynchronous Processing**: Non-blocking message handling
+- **Topic-Based Routing**: Efficient message distribution
+- **Load Balancing**: Distributed processing across cluster nodes
+
+=== Database Optimization
+
+- **Connection Pooling**: Efficient database connection management
+- **Query Optimization**: Performance-tuned database queries
+- **Indexing Strategy**: Optimized database indexes for common operations
+
+== Monitoring and Observability
+
+=== Logging
+
+- **SLF4J**: Standardized logging interface
+- **Logback**: Configurable logging implementation
+- **Structured Logging**: JSON-formatted logs for analysis
+
+=== Metrics and Monitoring
+
+- **JMX**: Java Management Extensions for system monitoring
+- **Spring Boot Actuator**: Application health and metrics
+- **Custom Metrics**: Application-specific performance indicators
+
+== Extension Points
+
+=== Plugin Development
+
+1. Implement `PluginLifecycle` interface
+2. Define plugin configuration
+3. Register plugin with Plugin Manager
+4. Utilize Plugin APIs for system integration
+
+=== Custom REST Endpoints
+
+1. Extend `BaseRestController`
+2. Implement REST endpoint methods
+3. Register with Spring Boot
+4. Define security constraints
+
+=== Federation Extensions
+
+1. Implement federation policies
+2. Define custom message routing
+3. Configure federation connections
+4. Implement security constraints
+
+== Conclusion
+
+The TAK Server architecture provides a robust, scalable, and extensible platform for situational awareness and collaboration.
+The modular design enables customization and integration while maintaining system stability and performance.
+
+Key architectural strengths:
+
+- **Modular Design**: Clear separation of concerns
+- **Extensible Plugin System**: Support for custom functionality
+- **Distributed Architecture**: Scalability and high availability
+- **Comprehensive APIs**: Multiple integration points
+- **Security-First Design**: Built-in security at all layers
+- **Federation Support**: Multi-organizational data sharing

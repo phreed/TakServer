@@ -1,0 +1,273 @@
+@startuml
+!define RECTANGLE class
+
+package "Client Applications" {
+    RECTANGLE WebBrowser {
+        +WebTAK UI
+        +Admin Console
+        +HTTPS Requests
+    }
+
+    RECTANGLE MobileApps {
+        +ATAK/iTAK
+        +Custom Apps
+        +REST API Calls
+    }
+
+    RECTANGLE ExternalSystems {
+        +Third-party Integration
+        +API Clients
+        +Automated Tools
+    }
+}
+
+package "REST API Layer" {
+    RECTANGLE BaseRestController {
+        <<Abstract>>
+        +Common functionality
+        +Error handling
+        +Security context
+    }
+
+    package "Core APIs" {
+        RECTANGLE ConfigAPI {
+            +GET /config
+            +PUT /config
+            +System settings
+        }
+
+        RECTANGLE SubmissionApi {
+            +POST /submission
+            +File uploads
+            +Message injection
+        }
+
+        RECTANGLE ContactManagerApi {
+            +GET /contacts
+            +Contact search
+            +Presence data
+        }
+
+        RECTANGLE HomeApi {
+            +GET /
+            +WebTAK interface
+            +Dashboard
+        }
+    }
+
+    package "Data Management APIs" {
+        RECTANGLE DataFeedApi {
+            +GET /feeds
+            +POST /feeds
+            +Feed management
+        }
+
+        RECTANGLE CotQueryApi {
+            +GET /cot/search
+            +CoT data queries
+            +Historical data
+        }
+
+        RECTANGLE MapLayersApi {
+            +GET /maplayers
+            +POST /maplayers
+            +Layer management
+        }
+
+        RECTANGLE InjectionApi {
+            +POST /inject
+            +Message injection
+            +Data simulation
+        }
+    }
+
+    package "Security APIs" {
+        RECTANGLE SecurityAuthenticationApi {
+            +POST /login
+            +POST /logout
+            +Session management
+        }
+
+        RECTANGLE GroupsApi {
+            +GET /groups
+            +POST /groups
+            +User groups
+        }
+
+        RECTANGLE TokenApi {
+            +GET /oauth/token
+            +Token management
+            +API keys
+        }
+
+        RECTANGLE LDAPApi {
+            +GET /ldap/users
+            +LDAP integration
+            +Directory sync
+        }
+    }
+
+    package "Federation APIs" {
+        RECTANGLE FederationApi {
+            +GET /federation
+            +POST /federation
+            +Connection management
+        }
+
+        RECTANGLE FederationConfigApi {
+            +GET /federation/config
+            +PUT /federation/config
+            +Policy management
+        }
+    }
+
+    package "Administrative APIs" {
+        RECTANGLE ProfileAPI {
+            +GET /profiles
+            +POST /profiles
+            +Device profiles
+        }
+
+        RECTANGLE ProfileAdminAPI {
+            +GET /admin/profiles
+            +Administrative profiles
+            +System configuration
+        }
+
+        RECTANGLE ExCheckAPI {
+            +GET /excheck
+            +Exercise check
+            +System validation
+        }
+    }
+
+    package "Specialized APIs" {
+        RECTANGLE IconsetIconApi {
+            +GET /iconsets
+            +POST /iconsets
+            +Icon management
+        }
+
+        RECTANGLE UIDSearchApi {
+            +GET /search/uid
+            +UID-based search
+            +Entity lookup
+        }
+
+        RECTANGLE VBMConfigurationApi {
+            +GET /vbm/api
+            +VBM configuration
+            +Video management
+        }
+
+        RECTANGLE FileConfigurationApi {
+            +GET /files/api
+            +File configuration
+            +Storage management
+        }
+    }
+}
+
+package "Service Layer" {
+    RECTANGLE MessageProcessor {
+        +Message routing
+        +Event processing
+        +Business logic
+    }
+
+    RECTANGLE SecurityServices {
+        +Authentication
+        +Authorization
+        +Session management
+    }
+
+    RECTANGLE DataServices {
+        +Data persistence
+        +Query execution
+        +Cache management
+    }
+
+    RECTANGLE FederationServices {
+        +Message federation
+        +Policy enforcement
+        +Connection management
+    }
+}
+
+package "Data Layer" {
+    RECTANGLE Database {
+        +PostgreSQL
+        +User data
+        +Mission data
+        +Configuration
+    }
+
+    RECTANGLE FileSystem {
+        +File storage
+        +Binary data
+        +Backups
+    }
+
+    RECTANGLE Cache {
+        +Redis/Ignite
+        +Session cache
+        +Data cache
+    }
+}
+
+' Client to API connections
+WebBrowser --> ConfigAPI : HTTPS
+WebBrowser --> HomeApi : HTTPS
+MobileApps --> SubmissionApi : HTTPS
+MobileApps --> ContactManagerApi : HTTPS
+ExternalSystems --> DataFeedApi : HTTPS
+ExternalSystems --> TokenApi : HTTPS
+
+' API inheritance
+BaseRestController <|-- ConfigAPI
+BaseRestController <|-- SubmissionApi
+BaseRestController <|-- ContactManagerApi
+BaseRestController <|-- DataFeedApi
+BaseRestController <|-- SecurityAuthenticationApi
+BaseRestController <|-- GroupsApi
+BaseRestController <|-- FederationApi
+BaseRestController <|-- ProfileAPI
+
+' API to Service connections
+ConfigAPI --> MessageProcessor
+SubmissionApi --> MessageProcessor
+ContactManagerApi --> DataServices
+DataFeedApi --> DataServices
+SecurityAuthenticationApi --> SecurityServices
+GroupsApi --> SecurityServices
+FederationApi --> FederationServices
+ProfileAPI --> DataServices
+
+' Service to Data connections
+MessageProcessor --> Database
+MessageProcessor --> Cache
+DataServices --> Database
+DataServices --> FileSystem
+SecurityServices --> Database
+SecurityServices --> Cache
+FederationServices --> Database
+
+' Cross-cutting concerns
+SecurityServices --> ConfigAPI : secures
+SecurityServices --> SubmissionApi : secures
+SecurityServices --> DataFeedApi : secures
+SecurityServices --> FederationApi : secures
+
+' API grouping notes
+note top of ConfigAPI : Core system\nmanagement APIs
+note top of DataFeedApi : Data ingestion\nand management
+note top of SecurityAuthenticationApi : Authentication\nand authorization
+note top of FederationApi : Inter-system\ncommunication
+note top of ProfileAPI : Configuration\nand administration
+
+' Security flow
+note right of SecurityServices : All API calls\ngo through security\nvalidation and\nauthorization checks
+
+' Data flow
+note bottom of MessageProcessor : Central message\nprocessing hub for\nall API operations
+@enduml

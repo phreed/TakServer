@@ -1,0 +1,164 @@
+@startuml
+!define RECTANGLE class
+
+package "TAK Server Instance A" {
+    RECTANGLE TakServerCoreA {
+        +Message Processing
+        +User Management
+        +Data Storage
+    }
+
+    RECTANGLE FederationClientA {
+        +Outgoing Connections
+        +Message Filtering
+        +Policy Enforcement
+    }
+
+    RECTANGLE FederationServerA {
+        +Incoming Connections
+        +Authentication
+        +Authorization
+    }
+}
+
+package "Federation Hub" {
+    RECTANGLE FederationHubBroker {
+        +Message Routing
+        +Policy Enforcement
+        +Connection Management
+        +Load Balancing
+    }
+
+    RECTANGLE FederationHubPolicy {
+        +Access Control
+        +Data Sharing Rules
+        +Security Constraints
+        +Audit Logging
+    }
+
+    RECTANGLE FederationHubUI {
+        +Web Interface
+        +Configuration Management
+        +Monitoring Dashboard
+        +Policy Administration
+    }
+}
+
+package "TAK Server Instance B" {
+    RECTANGLE TakServerCoreB {
+        +Message Processing
+        +User Management
+        +Data Storage
+    }
+
+    RECTANGLE FederationClientB {
+        +Outgoing Connections
+        +Message Filtering
+        +Policy Enforcement
+    }
+
+    RECTANGLE FederationServerB {
+        +Incoming Connections
+        +Authentication
+        +Authorization
+    }
+}
+
+package "TAK Server Instance C" {
+    RECTANGLE TakServerCoreC {
+        +Message Processing
+        +User Management
+        +Data Storage
+    }
+
+    RECTANGLE FederationClientC {
+        +Outgoing Connections
+        +Message Filtering
+        +Policy Enforcement
+    }
+
+    RECTANGLE FederationServerC {
+        +Incoming Connections
+        +Authentication
+        +Authorization
+    }
+}
+
+package "Federation Common Components" {
+    RECTANGLE FederationNode {
+        +Node Identity
+        +Connection State
+        +Routing Information
+    }
+
+    RECTANGLE Federate {
+        +Endpoint Definition
+        +Connection Parameters
+        +Authentication Credentials
+    }
+
+    RECTANGLE FederateEdge {
+        +Connection Link
+        +Quality Metrics
+        +Status Monitoring
+    }
+
+    RECTANGLE FederationPolicyGraph {
+        +Policy Rules
+        +Access Matrix
+        +Data Flow Control
+    }
+
+    RECTANGLE FederateGroup {
+        +Group Membership
+        +Permission Sets
+        +Data Sharing Scope
+    }
+}
+
+' Direct Federation Connections
+TakServerCoreA <--> FederationClientA
+FederationClientA <--> FederationServerB : Direct Federation
+FederationServerB <--> TakServerCoreB
+
+TakServerCoreB <--> FederationClientB
+FederationClientB <--> FederationServerC : Direct Federation
+FederationServerC <--> TakServerCoreC
+
+' Hub-based Federation Connections
+FederationClientA <--> FederationHubBroker : Hub Federation
+FederationClientB <--> FederationHubBroker : Hub Federation
+FederationClientC <--> FederationHubBroker : Hub Federation
+
+' Federation Hub Internal Connections
+FederationHubBroker --> FederationHubPolicy : enforces
+FederationHubBroker <--> FederationHubUI : managed by
+
+' Common Components Usage
+FederationClientA --> FederationNode : uses
+FederationClientB --> FederationNode : uses
+FederationClientC --> FederationNode : uses
+
+FederationServerA --> Federate : implements
+FederationServerB --> Federate : implements
+FederationServerC --> Federate : implements
+
+FederationClientA --> FederateEdge : creates
+FederationClientB --> FederateEdge : creates
+FederationClientC --> FederateEdge : creates
+
+FederationHubPolicy --> FederationPolicyGraph : maintains
+FederationHubPolicy --> FederateGroup : manages
+
+' Message Flow Examples
+note top of FederationClientA : CoT Messages\nMission Data\nFile Transfers
+note top of FederationHubBroker : Central Message\nRouting Hub
+note top of FederationServerB : Authenticated\nIncoming Messages
+
+' Federation Types
+note left of FederationClientA : Point-to-Point\nFederation
+note right of FederationHubBroker : Hub-and-Spoke\nFederation
+
+' Security Notes
+note bottom of FederationHubPolicy : Certificate-based\nAuthentication\nRole-based Authorization
+@enduml
